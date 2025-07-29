@@ -21,7 +21,6 @@ jobs:
       - run: tuist install
       - run: EXCLUDED_ARCHS=x86_64 ARCHS=arm64 VALID_ARCHS=arm64 tuist build Self-Compiled -C Release --build-output-path ./build
       - name: Zip Cork.app
-        working-directory: Cork
         run: |
           ditto -c -k --sequesterRsrc --keepParent build/Release/Cork.app Cork.app.zip
       - name: Upload build artifacts
