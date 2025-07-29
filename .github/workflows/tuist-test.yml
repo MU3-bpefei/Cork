@@ -9,12 +9,13 @@ on:
       - main
 jobs:
   test:
-    runs-on: macos-15
+    runs-on: macos-15-arm64
     steps:
       - uses: actions/checkout@v4
       - uses: jdx/mise-action@v2
-      - name: Select Xcode
-        run: sudo xcode-select -switch /Applications/Xcode_16.1.app
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
       - name: Fix plugins
         run: defaults write com.apple.dt.Xcode IDESkipPackagePluginFingerprintValidatation -bool YES
       - run: tuist install
@@ -23,5 +24,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Cork-build-artifacts
-          path: build/release
+          path: |
+            build/release/Cork.app
+            !build/release/Cork.app.dSYM
           retention-days: 30
