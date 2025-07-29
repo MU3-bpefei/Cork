@@ -9,7 +9,7 @@ on:
       - main
 jobs:
   test:
-    runs-on: macos-15-arm64
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - uses: jdx/mise-action@v2
@@ -19,12 +19,18 @@ jobs:
       - name: Fix plugins
         run: defaults write com.apple.dt.Xcode IDESkipPackagePluginFingerprintValidatation -bool YES
       - run: tuist install
-      - run: tuist build Self-Compiled -C Release --build-output-path ./build
+      - run: EXCLUDED_ARCHS=x86_64 ARCHS=arm64 VALID_ARCHS=arm64 tuist build Self-Compiled -C Release --build-output-path ./build
+      - name: Zip Cork.app
+        working-directory: Cork
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent build/Release/Cork.app Cork.app.zip
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: Cork-build-artifacts
-          path: |
-            build/release/Cork.app
-            !build/release/Cork.app.dSYM
+          path: Cork.app.zip
           retention-days: 30
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Cork.app.zip
