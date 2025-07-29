@@ -1,5 +1,6 @@
 name: Test Application
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - main
@@ -10,11 +11,17 @@ jobs:
   test:
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: jdx/mise-action@v2
       - name: Select Xcode
         run: sudo xcode-select -switch /Applications/Xcode_16.1.app
       - name: Fix plugins
         run: defaults write com.apple.dt.Xcode IDESkipPackagePluginFingerprintValidatation -bool YES
       - run: tuist install
-      - run: tuist test Cork
+      - run: tuist build Self-Compiled -C Release --build-output-path ./build
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Cork-build-artifacts
+          path: build/release
+          retention-days: 30
