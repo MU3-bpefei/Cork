@@ -29,7 +29,3 @@ jobs:
           name: Cork-build-artifacts
           path: Cork.app.zip
           retention-days: 30
-      - name: Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: Cork.app.zip
